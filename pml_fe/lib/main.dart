@@ -4,6 +4,9 @@ import 'pages/landing_page.dart';
 import 'pages/pml_page.dart';
 import 'pages/settings_page.dart';
 import 'pages/profile_page.dart';
+import 'pages/recipie_page.dart';
+import 'pages/recipie_detail_page.dart';
+import 'pages/interactive_cooking_page.dart';
 
 void main() {
   runApp(DementiaCookingApp());
@@ -19,6 +22,22 @@ class DementiaCookingApp extends StatelessWidget {
       GoRoute(path: '/pml', builder: (context, state) => PMLPage()),
       GoRoute(path: '/settings', builder: (context, state) => SettingsPage()),
       GoRoute(path: '/profile', builder: (context, state) => ProfilePage()),
+      GoRoute(path: '/recipes', builder: (context, state) => RecipePage()),
+      GoRoute(
+        path: '/recipe-details',
+        builder: (context, state) {
+          final recipe =
+              state.extra as Map<String, dynamic>; // ✅ Pass data through extra
+          return RecipeDetailPage(recipe: recipe);
+        },
+      ),
+      GoRoute(
+        path: '/interactive-cooking',
+        builder: (context, state) {
+          final recipe = state.extra as Map<String, dynamic>;
+          return InteractiveCookingPage(recipe: recipe);
+        },
+      ),
     ],
   );
 
