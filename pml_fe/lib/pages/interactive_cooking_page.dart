@@ -216,21 +216,45 @@ class _InteractiveCookingPageState extends State<InteractiveCookingPage> {
                           physics: NeverScrollableScrollPhysics(),
                           itemCount: steps.length,
                           itemBuilder: (context, index) {
-                            // ✅ Extract step value from map
-                            String stepText =
-                                steps[index]['step'] ?? 'Step not available';
+                            String stepText = steps[index]['step'] ?? '';
+                            String? imageUrl = steps[index]['image'];
 
                             return Card(
                               margin: EdgeInsets.symmetric(vertical: 8),
                               color: Colors.grey[200],
                               child: Padding(
                                 padding: EdgeInsets.all(16.0),
-                                child: Center(
-                                  child: Text(
-                                    stepText,
-                                    style: TextStyle(fontSize: 18),
-                                    textAlign: TextAlign.center,
-                                  ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    if (imageUrl != null)
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(12),
+                                        child: Image.network(
+                                          imageUrl,
+                                          height: 150,
+                                          width: 150,
+                                          fit: BoxFit.cover,
+                                          loadingBuilder: (
+                                            context,
+                                            child,
+                                            progress,
+                                          ) {
+                                            if (progress == null) return child;
+                                            return CircularProgressIndicator();
+                                          },
+                                          errorBuilder:
+                                              (context, error, stackTrace) =>
+                                                  Icon(Icons.error, size: 40),
+                                        ),
+                                      ),
+                                    SizedBox(height: 12),
+                                    Text(
+                                      stepText,
+                                      style: TextStyle(fontSize: 18),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ],
                                 ),
                               ),
                             );
@@ -278,6 +302,8 @@ class _InteractiveCookingPageState extends State<InteractiveCookingPage> {
               ],
             ),
           ),
+
+          // ✅ Centered Star-Shaped Confetti
           Align(
             alignment: Alignment.center,
             child: ConfettiWidget(
