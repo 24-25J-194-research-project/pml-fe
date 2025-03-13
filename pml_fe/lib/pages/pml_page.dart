@@ -13,6 +13,7 @@ class PMLPage extends StatefulWidget {
 
 class _PMLPageState extends State<PMLPage> {
   final TextEditingController _messageController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   List<Map<String, String>> _chatHistory = []; // Stores chat messages
   String _response = "Ask me about cooking!";
   late stt.SpeechToText _speech;
@@ -24,12 +25,18 @@ class _PMLPageState extends State<PMLPage> {
   void initState() {
     super.initState();
     _initializeAssistant();
-    _loadSettings();
+    // _loadSettings();
     _speech = stt.SpeechToText();
+
+    _loadSettings().then((_) {
+      if (_historyMode) {
+        _loadConversationHistory();
+      }
+    });
   }
 
   // Load History Mode setting
-  void _loadSettings() async {
+  Future<void> _loadSettings() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       _historyMode = prefs.getBool('historyMode') ?? false;
@@ -41,6 +48,27 @@ class _PMLPageState extends State<PMLPage> {
       await ApiService.createAssistant("user1");
     } catch (e) {
       print("Error: $e");
+    }
+  }
+
+  void _loadConversationHistory() async {
+    try {
+      final response = await ApiService.getConversationHistory("user1");
+      setState(() {
+        _chatHistory = List<Map<String, String>>.from(
+          response['conversationHistory'].map(
+            (item) => {
+              "role": item["role"].toString(),
+              "text": item["content"].toString(),
+            },
+          ),
+        );
+      });
+
+      // ✅ Longer delay ensures full scroll extent is available
+      _scrollToBottom();
+    } catch (e) {
+      print("Error loading conversation history: $e");
     }
   }
 
@@ -105,6 +133,7 @@ class _PMLPageState extends State<PMLPage> {
         _response = reply;
         if (_historyMode) {
           _chatHistory.add({"role": "assistant", "text": reply});
+          _scrollToBottom(); // ✅ Ensure full scroll after response
         }
       });
     } catch (e) {
@@ -112,6 +141,20 @@ class _PMLPageState extends State<PMLPage> {
     }
 
     _messageController.clear();
+  }
+
+  void _scrollToBottom() {
+    Future.delayed(Duration(milliseconds: 300), () {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_scrollController.hasClients) {
+          _scrollController.animateTo(
+            _scrollController.position.maxScrollExtent,
+            duration: Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+        }
+      });
+    });
   }
 
   void _speakResponse() async {
@@ -144,6 +187,7 @@ class _PMLPageState extends State<PMLPage> {
               child:
                   _historyMode
                       ? ListView.builder(
+                        controller: _scrollController,
                         itemCount: _chatHistory.length,
                         itemBuilder: (context, index) {
                           final message = _chatHistory[index];

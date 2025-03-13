@@ -17,11 +17,23 @@ class LandingPage extends StatelessWidget {
         ],
       ),
       body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            context.push('/pml');
-          },
-          child: Text("PML"),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                context.push('/pml');
+              },
+              child: Text("PML"),
+            ),
+            SizedBox(width: 20), // Add spacing between buttons
+            ElevatedButton(
+              onPressed: () {
+                context.push('/recipes');
+              },
+              child: Text("Recipes"),
+            ),
+          ],
         ),
       ),
     );
