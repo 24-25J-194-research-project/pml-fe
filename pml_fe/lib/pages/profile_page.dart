@@ -10,32 +10,40 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   final TextEditingController _healthConditionsController =
       TextEditingController();
-  String _healthConditions = '';
+
+  final TextEditingController _emergencyContactNameController =
+      TextEditingController();
+  final TextEditingController _emergencyContactEmailController =
+      TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _loadHealthConditions();
+    _loadProfileData();
   }
 
-  // Load health conditions from backend
-  void _loadHealthConditions() async {
+  // ✅ Load profile data from backend
+  void _loadProfileData() async {
     final response = await http.get(
       Uri.parse(
         'http://10.0.2.2:3000/cooking-assistant/user/health-conditions?username=user1',
       ),
     );
+
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       setState(() {
-        _healthConditions = data['healthConditions'] ?? '';
-        _healthConditionsController.text = _healthConditions;
+        _healthConditionsController.text = data['healthConditions'] ?? '';
+        _emergencyContactNameController.text =
+            data['emergencyContactName'] ?? '';
+        _emergencyContactEmailController.text =
+            data['emergencyContactEmail'] ?? '';
       });
     }
   }
 
-  // Save health conditions to MongoDB
-  void _saveHealthConditions() async {
+  // ✅ Save data to backend
+  void _saveProfileData() async {
     final response = await http.post(
       Uri.parse(
         'http://10.0.2.2:3000/cooking-assistant/user/update-health-conditions',
@@ -44,20 +52,19 @@ class _ProfilePageState extends State<ProfilePage> {
       body: jsonEncode({
         "username": "user1",
         "healthConditions": _healthConditionsController.text,
+        "emergencyContactName": _emergencyContactNameController.text,
+        "emergencyContactEmail": _emergencyContactEmailController.text,
       }),
     );
 
     if (response.statusCode == 200) {
-      setState(() {
-        _healthConditions = _healthConditionsController.text;
-      });
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text("Health Conditions Saved")));
+      ).showSnackBar(SnackBar(content: Text("Profile updated successfully!")));
     } else {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text("Failed to save")));
+      ).showSnackBar(SnackBar(content: Text("Failed to update profile")));
     }
   }
 
@@ -70,20 +77,20 @@ class _ProfilePageState extends State<ProfilePage> {
         child: Column(
           children: [
             Text("Health Conditions", style: TextStyle(fontSize: 18)),
-            SizedBox(height: 10),
-            TextField(
-              controller: _healthConditionsController,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: "E.g., Diabetes, High BP, Lactose Intolerance",
-              ),
-              maxLines: 3,
-            ),
+            TextField(controller: _healthConditionsController),
+
             SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _saveHealthConditions,
-              child: Text("Save"),
-            ),
+
+            Text("Emergency Contact Name", style: TextStyle(fontSize: 18)),
+            TextField(controller: _emergencyContactNameController),
+
+            SizedBox(height: 20),
+
+            Text("Emergency Contact Email", style: TextStyle(fontSize: 18)),
+            TextField(controller: _emergencyContactEmailController),
+
+            SizedBox(height: 20),
+            ElevatedButton(onPressed: _saveProfileData, child: Text("Save")),
           ],
         ),
       ),

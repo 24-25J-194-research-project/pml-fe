@@ -1,6 +1,9 @@
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'dart:convert';
 import '../utils/star_path.dart';
 import '../utils/time_parser.dart';
 
@@ -20,6 +23,7 @@ class _InteractiveCookingPageState extends State<InteractiveCookingPage> {
   late PageController _pageController;
   late ConfettiController _confettiController;
   String? _timerValue;
+  String? _emergencyContactEmail;
 
   @override
   void initState() {
@@ -36,6 +40,7 @@ class _InteractiveCookingPageState extends State<InteractiveCookingPage> {
     );
 
     _loadProgress();
+    _loadEmergencyContact();
   }
 
   @override
@@ -43,6 +48,27 @@ class _InteractiveCookingPageState extends State<InteractiveCookingPage> {
     _pageController.dispose();
     _confettiController.dispose();
     super.dispose();
+  }
+
+  // ✅ Load emergency contact info from backend
+  Future<void> _loadEmergencyContact() async {
+    try {
+      final response = await http.get(
+        Uri.parse(
+          'http://10.0.2.2:3000/cooking-assistant/user/health-conditions?username=user1',
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        setState(() {
+          _emergencyContactEmail = data['emergencyContactEmail'];
+        });
+        print("Emergency Contact Email: $_emergencyContactEmail");
+      }
+    } catch (e) {
+      print("Error loading emergency contact: $e");
+    }
   }
 
   // ✅ Load progress from SharedPreferences
@@ -98,9 +124,11 @@ class _InteractiveCookingPageState extends State<InteractiveCookingPage> {
     if (_currentStepIndex < widget.recipe['steps'].length - 1) {
       setState(() {
         _currentStepIndex++;
-        _timerValue = extractTime(
-          widget.recipe['steps'][_currentStepIndex]['step'],
-        );
+        // _timerValue = extractTime(
+        //   widget.recipe['steps'][_currentStepIndex]['time'],
+        // );
+        final time = widget.recipe['steps'][_currentStepIndex]['time'];
+        _timerValue = time != null ? extractTime(time) : null;
       });
 
       _pageController.animateToPage(
@@ -151,13 +179,73 @@ class _InteractiveCookingPageState extends State<InteractiveCookingPage> {
     _pageController.jumpToPage(0);
   }
 
+  // ✅ Send emergency email
+  void _sendEmergencyEmail() async {
+    final serviceId = dotenv.env['SERVICE_ID'];
+    final templateId = dotenv.env['TEMPLATE_ID'];
+    final publicKey = dotenv.env['PUBLIC_KEY'];
+
+    if (_emergencyContactEmail == null || _emergencyContactEmail!.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Emergency contact not set")),
+      );
+      return;
+    }
+
+    final url = Uri.parse('https://api.emailjs.com/api/v1.0/email/send');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'origin': 'http://localhost',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'service_id': serviceId,
+          'template_id': templateId,
+          'user_id': publicKey,
+          'template_params': {
+            'email': _emergencyContactEmail,
+            'user': 'Emergency Contact',
+            'message': 'Emergency! Please contact the user immediately.',
+          },
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text("Emergency email sent!")));
+      } else {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text("Failed to send email")));
+      }
+    } catch (e) {
+      print('Error sending email: $e');
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Failed to send email")));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final ingredients = widget.recipe['ingredients'] as List<dynamic>;
     final steps = widget.recipe['steps'] as List<dynamic>;
 
     return Scaffold(
-      appBar: AppBar(title: Text("Interactive Cooking")),
+      appBar: AppBar(
+        title: Text("Interactive Cooking"),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.emergency),
+            color: Colors.red,
+            onPressed: _sendEmergencyEmail, // ✅ Send emergency email
+          ),
+        ],
+      ),
       body: Stack(
         children: [
           Padding(
