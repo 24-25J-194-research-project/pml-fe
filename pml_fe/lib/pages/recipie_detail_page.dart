@@ -56,7 +56,7 @@ class RecipeDetailPage extends StatelessWidget {
 
                         SizedBox(height: 8),
                         Text(
-                          'Ingredients: ${recipe['ingredients'].length}',
+                          '${recipe['ingredients'].length} Ingredients',
                           style: TextStyle(fontSize: 14),
                         ),
                       ],
@@ -89,7 +89,7 @@ class RecipeDetailPage extends StatelessWidget {
 
                         SizedBox(height: 8),
                         Text(
-                          'Steps: ${recipe['steps'].length}',
+                          '${recipe['steps'].length} Steps',
                           style: TextStyle(fontSize: 14),
                         ),
                       ],
