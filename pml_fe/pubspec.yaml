@@ -31,4 +31,5 @@ flutter:
   assets:
     - assets/alarm.wav
     - assets/animations/
+    - assets/images/
     - .env
