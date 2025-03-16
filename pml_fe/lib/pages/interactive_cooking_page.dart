@@ -89,9 +89,11 @@ class _InteractiveCookingPageState extends State<InteractiveCookingPage> {
     }
 
     // ✅ Extract timer value from current step
-    _timerValue = extractTime(
-      widget.recipe['steps'][_currentStepIndex]['step'],
-    );
+    // _timerValue = extractTime(
+    //   widget.recipe['steps'][_currentStepIndex]['step'],
+    // );
+    final time = widget.recipe['steps'][_currentStepIndex]['time'];
+    _timerValue = time != null ? extractTime(time) : null;
 
     setState(() {});
     _pageController.jumpToPage(_currentStepIndex);
@@ -139,6 +141,23 @@ class _InteractiveCookingPageState extends State<InteractiveCookingPage> {
       _saveProgress();
     } else {
       _showCompletion(); // ✅ Trigger confetti
+    }
+  }
+
+  void _previousStep() {
+    if (_currentStepIndex > 0) {
+      setState(() {
+        _currentStepIndex--;
+        final time = widget.recipe['steps'][_currentStepIndex]['time'];
+        _timerValue = time != null ? extractTime(time) : null;
+      });
+
+      _pageController.animateToPage(
+        _currentStepIndex,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+      _saveProgress();
     }
   }
 
@@ -230,6 +249,133 @@ class _InteractiveCookingPageState extends State<InteractiveCookingPage> {
     }
   }
 
+  void _showMeasuringTipsDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.0),
+          ),
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.85,
+            height: MediaQuery.of(context).size.height * 0.5, // Bigger Dialog
+            padding: EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  "Measuring Tips",
+                  style: TextStyle(
+                    fontSize: 24, // Larger Font
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 16),
+
+                // ✅ 2x2 Grid Layout for Measuring Tips
+                Expanded(
+                  child: GridView.count(
+                    crossAxisCount: 2, // 2 columns
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    childAspectRatio: 1.0, // Make tiles square
+                    children: [
+                      // ✅ Table Spoon
+                      _buildTipTile(
+                        "assets/images/tableSpoon.png", // Add your image path
+                        "Table Spoon",
+                      ),
+
+                      // ✅ Tea Spoon
+                      _buildTipTile(
+                        "assets/images/teaSpoon.png", // Add your image path
+                        "Tea Spoon",
+                      ),
+
+                      // ✅ Electric Scale
+                      _buildTipTile(
+                        "assets/images/scale.png", // Add your image path
+                        "Electric Scale",
+                      ),
+
+                      // ✅ Extra Tip
+                      _buildTipTile(
+                        "assets/images/tip.png", // Add your image path
+                        "This is a table spoon",
+                      ),
+                    ],
+                  ),
+                ),
+
+                SizedBox(height: 12),
+
+                // ✅ Close Button
+                SizedBox(
+                  width: double.infinity, // Take full width
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      padding: EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      "Got It !",
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // ✅ Helper Function for Tip Tile
+  Widget _buildTipTile(String imagePath, String label) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          width: 100, // Bigger tile size
+          height: 100,
+          decoration: BoxDecoration(
+            color: Colors.grey[200],
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 5,
+                offset: Offset(0, 3),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.asset(
+              imagePath,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Icon(Icons.error, size: 40, color: Colors.red);
+              },
+            ),
+          ),
+        ),
+        SizedBox(height: 8),
+        Text(
+          label,
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+          textAlign: TextAlign.center,
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final ingredients = widget.recipe['ingredients'] as List<dynamic>;
@@ -258,12 +404,23 @@ class _InteractiveCookingPageState extends State<InteractiveCookingPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        "Ingredients",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Let's check our ingredients",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.info_outline),
+                            onPressed: () {
+                              _showMeasuringTipsDialog();
+                            },
+                          ),
+                        ],
                       ),
                       Expanded(
                         child: ListView.builder(
@@ -285,6 +442,8 @@ class _InteractiveCookingPageState extends State<InteractiveCookingPage> {
                   ),
                 ),
 
+                SizedBox(height: 30),
+
                 // ✅ Steps Section (Carousel)
                 Expanded(
                   flex: 3,
@@ -292,7 +451,7 @@ class _InteractiveCookingPageState extends State<InteractiveCookingPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Steps",
+                        "Let's go step by step",
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -352,33 +511,78 @@ class _InteractiveCookingPageState extends State<InteractiveCookingPage> {
                       SizedBox(height: 16),
 
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          if (_timerValue != null)
-                            ElevatedButton(
-                              onPressed: () {
-                                startTimer(_timerValue!);
-                              },
-                              child: Text("Set Timer ($_timerValue)"),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.orange,
-                                padding: EdgeInsets.all(12),
+                          // ✅ Previous Button (Hidden for first step)
+                          if (_currentStepIndex > 0)
+                            Expanded(
+                              flex:
+                                  3, // ✅ Make consistent width with Next button
+                              child: ElevatedButton(
+                                onPressed: _previousStep,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.grey[400],
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                child: const Text("Previous"),
                               ),
                             ),
-                          SizedBox(width: 10),
+
+                          if (_timerValue != null) ...[
+                            const SizedBox(
+                              width: 12,
+                            ), // ✅ Add consistent spacing
+                            Expanded(
+                              flex:
+                                  4, // ✅ Timer button slightly wider for balance
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  startTimer(_timerValue!);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.orange,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                child: Text("Set Timer ($_timerValue)"),
+                              ),
+                            ),
+                          ],
+
+                          const SizedBox(width: 12), // ✅ Add consistent spacing
+                          // ✅ Next/Ready to Serve Button
                           Expanded(
+                            flex:
+                                3, // ✅ Same as Previous button for consistency
                             child: ElevatedButton(
                               onPressed: _nextStep,
-                              child: Text(
-                                _currentStepIndex == steps.length - 1
-                                    ? "Ready to Serve"
-                                    : "Next",
-                              ),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor:
-                                    _currentStepIndex == steps.length - 1
+                                    _currentStepIndex ==
+                                            widget.recipe['steps'].length - 1
                                         ? Colors.green
                                         : Colors.blue,
-                                padding: EdgeInsets.all(12),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: Text(
+                                _currentStepIndex ==
+                                        widget.recipe['steps'].length - 1
+                                    ? "Ready to Serve"
+                                    : "Next",
                               ),
                             ),
                           ),

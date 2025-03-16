@@ -94,7 +94,7 @@ class _RecipePageState extends State<RecipePage> {
                   TextField(
                     onChanged: (value) => name = value,
                     decoration: InputDecoration(
-                      hintText: "Enter a dish ...",
+                      hintText: "What you want to eat today?",
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(color: Colors.grey),
@@ -105,7 +105,7 @@ class _RecipePageState extends State<RecipePage> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 16),
+                  SizedBox(height: 30),
 
                   // ✅ Generate Button
                   ElevatedButton(

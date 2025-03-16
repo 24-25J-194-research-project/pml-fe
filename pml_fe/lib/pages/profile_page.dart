@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -8,12 +9,12 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  final TextEditingController _healthConditionsController =
-      TextEditingController();
-
   final TextEditingController _emergencyContactNameController =
       TextEditingController();
   final TextEditingController _emergencyContactEmailController =
+      TextEditingController();
+  List<String> _healthConditions = [];
+  final TextEditingController _healthConditionController =
       TextEditingController();
 
   @override
@@ -33,7 +34,8 @@ class _ProfilePageState extends State<ProfilePage> {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       setState(() {
-        _healthConditionsController.text = data['healthConditions'] ?? '';
+        _healthConditions =
+            (data['healthConditions'] as String?)?.split(',') ?? [];
         _emergencyContactNameController.text =
             data['emergencyContactName'] ?? '';
         _emergencyContactEmailController.text =
@@ -42,7 +44,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  // ✅ Save data to backend
+  // ✅ Save profile data to backend
   void _saveProfileData() async {
     final response = await http.post(
       Uri.parse(
@@ -51,7 +53,7 @@ class _ProfilePageState extends State<ProfilePage> {
       headers: {"Content-Type": "application/json"},
       body: jsonEncode({
         "username": "user1",
-        "healthConditions": _healthConditionsController.text,
+        "healthConditions": _healthConditions.join(','),
         "emergencyContactName": _emergencyContactNameController.text,
         "emergencyContactEmail": _emergencyContactEmailController.text,
       }),
@@ -68,32 +70,176 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  // ✅ Add health condition
+  void _addHealthCondition() {
+    String condition = _healthConditionController.text.trim();
+    if (condition.isNotEmpty && !_healthConditions.contains(condition)) {
+      setState(() {
+        _healthConditions.add(condition);
+        _healthConditionController.clear();
+      });
+    }
+  }
+
+  // ✅ Remove health condition
+  void _removeHealthCondition(int index) {
+    setState(() {
+      _healthConditions.removeAt(index);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Profile")),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
+      appBar: AppBar(),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(16),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Health Conditions", style: TextStyle(fontSize: 18)),
-            TextField(controller: _healthConditionsController),
+            // ✅ User Details Section
+            Center(
+              child: Column(
+                children: [
+                  // Text(
+                  //   "User Details",
+                  //   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  // ),
+                  SizedBox(height: 8),
+                  Lottie.asset(
+                    'assets/animations/cooking.json', // Placeholder animation
+                    height: 100,
+                    width: 100,
+                  ),
+                  SizedBox(height: 16),
+                ],
+              ),
+            ),
+            SizedBox(height: 40),
+            // ✅ Health Conditions Section
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Health Conditions",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                IconButton(
+                  icon: Icon(Icons.add_circle_outline, size: 28),
+                  onPressed: () => _showAddHealthConditionDialog(),
+                ),
+              ],
+            ),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children:
+                  _healthConditions.map((condition) {
+                    return Chip(
+                      label: Text(condition),
+                      deleteIcon: Icon(Icons.close, size: 18),
+                      onDeleted:
+                          () => _removeHealthCondition(
+                            _healthConditions.indexOf(condition),
+                          ),
+                      backgroundColor: Colors.grey[200],
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    );
+                  }).toList(),
+            ),
 
+            SizedBox(height: 40),
+
+            // ✅ Emergency Contact Section
+            Text(
+              "Emergency Contact",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             SizedBox(height: 20),
+            Row(
+              children: [
+                Lottie.asset(
+                  'assets/animations/cooking.json', // Placeholder animation
+                  height: 100,
+                  width: 100,
+                ),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    children: [
+                      TextField(
+                        controller: _emergencyContactNameController,
+                        decoration: InputDecoration(
+                          labelText: "Name",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 15),
+                      TextField(
+                        controller: _emergencyContactEmailController,
+                        decoration: InputDecoration(
+                          labelText: "Email",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
 
-            Text("Emergency Contact Name", style: TextStyle(fontSize: 18)),
-            TextField(controller: _emergencyContactNameController),
+            SizedBox(height: 50),
 
-            SizedBox(height: 20),
-
-            Text("Emergency Contact Email", style: TextStyle(fontSize: 18)),
-            TextField(controller: _emergencyContactEmailController),
-
-            SizedBox(height: 20),
-            ElevatedButton(onPressed: _saveProfileData, child: Text("Save")),
+            // ✅ Save Button
+            ElevatedButton(
+              onPressed: _saveProfileData,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                padding: EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: Center(
+                child: Text(
+                  "Save Details",
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
+              ),
+            ),
           ],
         ),
       ),
+    );
+  }
+
+  // ✅ Dialog for adding health condition
+  Future<void> _showAddHealthConditionDialog() async {
+    await showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: Text("Add Health Condition"),
+            content: TextField(
+              controller: _healthConditionController,
+              decoration: InputDecoration(hintText: "Enter health condition"),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  _addHealthCondition();
+                  Navigator.of(context).pop();
+                },
+                child: Text("Add"),
+              ),
+            ],
+          ),
     );
   }
 }
