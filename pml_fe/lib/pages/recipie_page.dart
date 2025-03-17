@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 import '../services/api_service.dart';
+import '../services/notification_service.dart';
 
 class RecipePage extends StatefulWidget {
   @override
@@ -10,6 +11,7 @@ class RecipePage extends StatefulWidget {
 
 class _RecipePageState extends State<RecipePage> {
   List<dynamic> _recipes = [];
+  final NotificationService _notificationService = NotificationService();
 
   @override
   void initState() {
@@ -31,8 +33,16 @@ class _RecipePageState extends State<RecipePage> {
   void _addRecipe() async {
     String? name = await _getRecipeName();
     if (name != null && name.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Generating recipe... Please wait."),
+          duration: Duration(seconds: 3),
+        ),
+      );
       await ApiService.createRecipe("user1", name);
       _loadRecipes(); // Refresh after adding
+      _notificationService.showRecipeGeneratedNotification();
+      _notificationService.playRecipeGeneratedSound();
     }
   }
 

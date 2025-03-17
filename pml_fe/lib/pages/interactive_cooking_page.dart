@@ -279,31 +279,25 @@ class _InteractiveCookingPageState extends State<InteractiveCookingPage> {
                     crossAxisCount: 2, // 2 columns
                     crossAxisSpacing: 16,
                     mainAxisSpacing: 16,
-                    childAspectRatio: 1.0, // Make tiles square
+                    childAspectRatio: 1.0,
                     children: [
                       // ✅ Table Spoon
                       _buildTipTile(
-                        "assets/images/tableSpoon.png", // Add your image path
+                        "assets/images/tableSpoon.png",
                         "Table Spoon",
                       ),
 
                       // ✅ Tea Spoon
-                      _buildTipTile(
-                        "assets/images/teaSpoon.png", // Add your image path
-                        "Tea Spoon",
-                      ),
+                      _buildTipTile("assets/images/teaSpoon.png", "Tea Spoon"),
 
                       // ✅ Electric Scale
                       _buildTipTile(
-                        "assets/images/scale.png", // Add your image path
+                        "assets/images/scale.png",
                         "Electric Scale",
                       ),
 
                       // ✅ Extra Tip
-                      _buildTipTile(
-                        "assets/images/tip.png", // Add your image path
-                        "This is a table spoon",
-                      ),
+                      _buildTipTile("assets/images/cup.png", " measuring cup"),
                     ],
                   ),
                 ),

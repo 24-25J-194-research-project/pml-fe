@@ -167,7 +167,7 @@ class _PMLPageState extends State<PMLPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Dementia Cooking Assistant"),
+        title: Text("Personal Cooking Assistant"),
         actions: [
           IconButton(
             icon: Icon(Icons.settings),

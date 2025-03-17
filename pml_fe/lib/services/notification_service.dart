@@ -60,7 +60,15 @@ class NotificationService {
     print("Notification shown successfully!");
   }
 
+  Future<void> showRecipeGeneratedNotification() async {
+    await showNotification("Your recipe is ready!", "Let's start cooking...");
+  }
+
   void playAlarm() {
     player.play(AssetSource('alarm.wav'));
+  }
+
+  void playRecipeGeneratedSound() {
+    player.play(AssetSource('recipie-ready.wav'));
   }
 }

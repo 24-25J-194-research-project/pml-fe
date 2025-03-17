@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:google_fonts/google_fonts.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -16,6 +17,8 @@ class _ProfilePageState extends State<ProfilePage> {
   List<String> _healthConditions = [];
   final TextEditingController _healthConditionController =
       TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _locationController = TextEditingController();
 
   @override
   void initState() {
@@ -40,6 +43,8 @@ class _ProfilePageState extends State<ProfilePage> {
             data['emergencyContactName'] ?? '';
         _emergencyContactEmailController.text =
             data['emergencyContactEmail'] ?? '';
+        _nameController.text = data['name'] ?? '';
+        _locationController.text = data['location'] ?? '';
       });
     }
   }
@@ -56,6 +61,8 @@ class _ProfilePageState extends State<ProfilePage> {
         "healthConditions": _healthConditions.join(','),
         "emergencyContactName": _emergencyContactNameController.text,
         "emergencyContactEmail": _emergencyContactEmailController.text,
+        "name": _nameController.text,
+        "location": _locationController.text,
       }),
     );
 
@@ -91,38 +98,86 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text(
+          "Manage User Profile",
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        elevation: 4,
+        shadowColor: Colors.black.withOpacity(0.2),
+      ),
+
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            SizedBox(height: 20),
             // ✅ User Details Section
-            Center(
+            Text(
+              "Your details",
+              style: GoogleFonts.bebasNeue(fontSize: 24, color: Colors.black87),
+            ),
+            Container(
+              padding: EdgeInsets.all(12),
+
               child: Column(
                 children: [
-                  // Text(
-                  //   "User Details",
-                  //   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  // ),
-                  SizedBox(height: 8),
-                  Lottie.asset(
-                    'assets/animations/cooking.json', // Placeholder animation
-                    height: 100,
-                    width: 100,
-                  ),
                   SizedBox(height: 16),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // ✅ Lottie Animation on the Left Side
+                      Lottie.asset(
+                        'assets/animations/profile.json',
+                        // height: 140,
+                        width: 120,
+                      ),
+                      SizedBox(width: 12),
+
+                      // ✅ Name and Home Location Fields on the Right Side
+                      Expanded(
+                        child: Column(
+                          children: [
+                            TextField(
+                              controller: _nameController,
+                              decoration: InputDecoration(
+                                labelText: "Name",
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 15),
+                            TextField(
+                              controller: _locationController,
+                              decoration: InputDecoration(
+                                labelText: "Home Location",
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
-            SizedBox(height: 40),
+            SizedBox(height: 20),
             // ✅ Health Conditions Section
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "Health Conditions",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  "perosnal health",
+                  style: GoogleFonts.bebasNeue(
+                    fontSize: 24,
+                    color: Colors.black87,
+                  ),
                 ),
                 IconButton(
                   icon: Icon(Icons.add_circle_outline, size: 28),
@@ -154,16 +209,16 @@ class _ProfilePageState extends State<ProfilePage> {
 
             // ✅ Emergency Contact Section
             Text(
-              "Emergency Contact",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              "emergency contact details",
+              style: GoogleFonts.bebasNeue(fontSize: 24, color: Colors.black87),
             ),
             SizedBox(height: 20),
             Row(
               children: [
                 Lottie.asset(
-                  'assets/animations/cooking.json', // Placeholder animation
-                  height: 100,
-                  width: 100,
+                  'assets/animations/family.json', // Placeholder animation
+                  height: 180,
+                  width: 120,
                 ),
                 SizedBox(width: 12),
                 Expanded(
@@ -224,21 +279,65 @@ class _ProfilePageState extends State<ProfilePage> {
     await showDialog(
       context: context,
       builder:
-          (context) => AlertDialog(
-            title: Text("Add Health Condition"),
-            content: TextField(
-              controller: _healthConditionController,
-              decoration: InputDecoration(hintText: "Enter health condition"),
+          (context) => Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
             ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  _addHealthCondition();
-                  Navigator.of(context).pop();
-                },
-                child: Text("Add"),
+            child: Padding(
+              padding: EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // 🔹 Title
+                  Text(
+                    "Add Health Condition",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 12),
+
+                  // 🔹 Lottie Animation
+                  Lottie.asset(
+                    'assets/animations/health.json',
+                    width: 200,
+                    height: 200,
+                    fit: BoxFit.cover,
+                  ),
+                  SizedBox(height: 16),
+
+                  // 🔹 Text Field
+                  TextField(
+                    controller: _healthConditionController,
+                    decoration: InputDecoration(
+                      hintText: "Enter health condition",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+
+                  // 🔹 Add Button
+                  ElevatedButton(
+                    onPressed: () {
+                      _addHealthCondition();
+                      Navigator.of(context).pop();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      padding: EdgeInsets.symmetric(vertical: 14),
+                      minimumSize: Size(double.infinity, 48),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      "Add",
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
     );
   }

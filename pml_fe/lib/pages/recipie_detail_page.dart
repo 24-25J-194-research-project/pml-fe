@@ -97,6 +97,7 @@ class RecipeDetailPage extends StatelessWidget {
                   ),
                 ],
               ),
+
               SizedBox(height: 20),
 
               // ✅ Ingredients Section
