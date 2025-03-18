@@ -42,7 +42,7 @@ class _RecipePageState extends State<RecipePage> {
       await ApiService.createRecipe("user1", name);
       _loadRecipes(); // Refresh after adding
       _notificationService.showRecipeGeneratedNotification();
-      _notificationService.playRecipeGeneratedSound();
+      // _notificationService.playRecipeGeneratedSound();
     }
   }
 

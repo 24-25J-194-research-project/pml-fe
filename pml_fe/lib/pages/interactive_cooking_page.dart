@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_tts/flutter_tts.dart';
+import 'package:lottie/lottie.dart';
+import 'package:flip_card/flip_card.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'dart:convert';
 import '../utils/star_path.dart';
 import '../utils/time_parser.dart';
@@ -25,6 +29,13 @@ class _InteractiveCookingPageState extends State<InteractiveCookingPage> {
   String? _timerValue;
   String? _emergencyContactEmail;
 
+  final FlutterTts _flutterTts = FlutterTts();
+
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _mealController = TextEditingController();
+
+  bool _isProfileLoaded = false;
+
   @override
   void initState() {
     super.initState();
@@ -41,6 +52,8 @@ class _InteractiveCookingPageState extends State<InteractiveCookingPage> {
 
     _loadProgress();
     _loadEmergencyContact();
+
+    _loadProfileData();
   }
 
   @override
@@ -48,6 +61,172 @@ class _InteractiveCookingPageState extends State<InteractiveCookingPage> {
     _pageController.dispose();
     _confettiController.dispose();
     super.dispose();
+  }
+
+  // ✅ Load profile data from backend
+  void _loadProfileData() async {
+    final response = await http.get(
+      Uri.parse(
+        'http://10.0.2.2:3000/cooking-assistant/user/health-conditions?username=user1',
+      ),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      print("Backend Data: $data");
+      setState(() {
+        _nameController.text = data['name'] ?? '';
+        _mealController.text = "Hot Chocolate";
+        _isProfileLoaded = true;
+      });
+    }
+  }
+
+  // ✅ Function to show the dialog and trigger TTS
+  void _showBreathingDialog() async {
+    // ✅ Ensure profile is loaded before showing dialog
+    if (!_isProfileLoaded) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Loading profile...")));
+      return;
+    }
+
+    String name =
+        _nameController.text.isNotEmpty ? _nameController.text : 'User';
+    String meal =
+        _mealController.text.isNotEmpty ? _mealController.text : 'a meal';
+
+    String message =
+        "Take a deep breath. Your name is $name. You are currently interacting with your personalized support application. You are in the middle of making ${widget.recipe['name']}. Take your time. You are in control.";
+
+    await _flutterTts.speak(message);
+
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            contentPadding: EdgeInsets.all(16),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "Take a Deep Breath.",
+                  style: GoogleFonts.bebasNeue(
+                    fontSize: 20,
+                    color: Colors.black87,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+                SizedBox(height: 12),
+
+                // ✅ Lottie Animation
+                Lottie.asset(
+                  'assets/animations/breath.json',
+                  width: 150,
+                  height: 150,
+                  fit: BoxFit.cover,
+                ),
+                SizedBox(height: 16),
+
+                // ✅ Flipping Card 1 — User's Name
+                FlipCard(
+                  direction: FlipDirection.HORIZONTAL,
+
+                  front: _buildCard(
+                    Text(
+                      "Tap to see your name",
+                      style: GoogleFonts.bebasNeue(
+                        fontSize: 20,
+                        color: Colors.black87,
+                        letterSpacing: 1.2,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+
+                  back: _buildCard(
+                    Text(
+                      "Your name is $name",
+                      style: GoogleFonts.bebasNeue(
+                        fontSize: 20,
+                        color: Colors.black87,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 16),
+
+                // ✅ Flipping Card 2 — Current Meal
+                FlipCard(
+                  direction: FlipDirection.HORIZONTAL,
+
+                  front: _buildCard(
+                    Text(
+                      "Tap to see your current task",
+                      style: GoogleFonts.bebasNeue(
+                        fontSize: 20,
+                        color: Colors.black87,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+
+                  back: _buildCard(
+                    Text(
+                      "You are making ${widget.recipe['name']}",
+                      style: GoogleFonts.bebasNeue(
+                        fontSize: 20,
+                        color: Colors.black87,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 24),
+
+                // ✅ Continue Button
+                ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Text(
+                    "Continue",
+                    style: TextStyle(fontSize: 16, color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+          ),
+    );
+  }
+
+  Widget _buildCard(Widget child) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Center(child: child), // ✅ Accepts any widget now
+    );
   }
 
   // ✅ Load emergency contact info from backend
@@ -380,9 +559,8 @@ class _InteractiveCookingPageState extends State<InteractiveCookingPage> {
         title: Text("Interactive Cooking"),
         actions: [
           IconButton(
-            icon: Icon(Icons.emergency),
-            color: Colors.red,
-            onPressed: _sendEmergencyEmail, // ✅ Send emergency email
+            icon: Icon(Icons.info_outline),
+            onPressed: _showBreathingDialog,
           ),
         ],
       ),
@@ -438,18 +616,28 @@ class _InteractiveCookingPageState extends State<InteractiveCookingPage> {
 
                 SizedBox(height: 30),
 
-                // ✅ Steps Section (Carousel)
                 Expanded(
                   flex: 3,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        "Let's go step by step",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Let's go step by step",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.emergency),
+                            color: Colors.red,
+                            onPressed:
+                                _sendEmergencyEmail, // ✅ Send emergency email
+                          ),
+                        ],
                       ),
                       Expanded(
                         child: PageView.builder(
