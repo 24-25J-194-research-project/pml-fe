@@ -1,53 +1,73 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lottie/lottie.dart';
 
 class LandingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // appBar: AppBar(
+
+      //   actions: [
+      //     IconButton(
+      //       icon: Icon(Icons.person),
+      //       onPressed: () {
+      //         context.push('/profile');
+      //       },
+      //     ),
+      //   ],
+      //   elevation: 4,
+      //   shadowColor: Colors.black.withOpacity(0.2),
+      // ),
       appBar: AppBar(
         centerTitle: true,
-        // title: Text(
-        //   "Personal Assistant",
-        //   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        // ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+
+        iconTheme: IconThemeData(color: Colors.black),
         actions: [
           IconButton(
-            icon: Icon(Icons.person),
+            icon: Icon(Icons.manage_accounts_outlined),
             onPressed: () {
               context.push('/profile');
             },
           ),
         ],
-        elevation: 4,
-        shadowColor: Colors.black.withOpacity(0.2),
       ),
-
+      extendBodyBehindAppBar: true,
       // ✅ Background Image
       body: Container(
-        // decoration: BoxDecoration(
-        //   image: DecorationImage(
-        //     image: AssetImage("assets/images/landing.png"),
-        //     fit: BoxFit.cover,
-        //   ),
-        // ),
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("assets/images/sky.jpg"),
+            fit: BoxFit.cover,
+          ),
+        ),
         padding: EdgeInsets.all(16),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            SizedBox(
+              height: 180,
+              width: 380,
+              child: Lottie.asset(
+                'assets/animations/sky.json',
+                fit: BoxFit.fill,
+              ),
+            ),
             // ✅ Welcome Text
             Text(
               "WELCOME BACK !",
               style: GoogleFonts.bebasNeue(
-                fontSize: 32,
+                fontSize: 50,
                 color: Colors.black87,
                 letterSpacing: 1.2,
               ),
             ),
             // SizedBox(height: 4),
             Text(
-              "Guidane you require is fingertips away 💓",
+              "Guidance you require is fingertips away 💓",
               style: GoogleFonts.roboto(fontSize: 14, color: Colors.black87),
             ),
             SizedBox(height: 32),
@@ -67,7 +87,7 @@ class LandingPage extends StatelessWidget {
                 elevation: 4, // Floating effect
               ),
               child: Text(
-                "Personalized Memory Lane",
+                "personal cooking assistant",
                 style: GoogleFonts.bebasNeue(
                   fontSize: 20,
                   color: Colors.black87,

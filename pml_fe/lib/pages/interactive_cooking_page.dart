@@ -190,18 +190,27 @@ class _InteractiveCookingPageState extends State<InteractiveCookingPage> {
                 SizedBox(height: 24),
 
                 // ✅ Continue Button
-                ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 32,
+                        vertical: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
-                  ),
-                  child: Text(
-                    "Continue",
-                    style: TextStyle(fontSize: 16, color: Colors.white),
+                    child: Text(
+                      "continue",
+                      style: GoogleFonts.bebasNeue(
+                        fontSize: 24,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -556,10 +565,14 @@ class _InteractiveCookingPageState extends State<InteractiveCookingPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Interactive Cooking"),
+        title: Text(
+          "INTERACTIVE COOKING",
+          style: GoogleFonts.bebasNeue(fontSize: 30, color: Colors.black),
+        ),
+        centerTitle: true,
         actions: [
           IconButton(
-            icon: Icon(Icons.info_outline),
+            icon: Icon(Icons.health_and_safety_sharp),
             onPressed: _showBreathingDialog,
           ),
         ],
@@ -632,7 +645,7 @@ class _InteractiveCookingPageState extends State<InteractiveCookingPage> {
                             ),
                           ),
                           IconButton(
-                            icon: Icon(Icons.emergency),
+                            icon: Icon(Icons.contact_emergency_rounded),
                             color: Colors.red,
                             onPressed:
                                 _sendEmergencyEmail, // ✅ Send emergency email

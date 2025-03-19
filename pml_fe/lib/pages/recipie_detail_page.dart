@@ -32,7 +32,7 @@ class RecipeDetailPage extends StatelessWidget {
                 children: [
                   // 🔹 First Lottie Animation (Ingredients Count)
                   Container(
-                    width: 130,
+                    width: 100,
                     padding: EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -50,22 +50,25 @@ class RecipeDetailPage extends StatelessWidget {
                         Lottie.asset(
                           'assets/animations/ing.json',
                           fit: BoxFit.cover,
-                          width: 80,
-                          height: 80,
+                          width: 50,
+                          height: 50,
                         ),
-
-                        SizedBox(height: 8),
+                        SizedBox(height: 6),
                         Text(
                           '${recipe['ingredients'].length} Ingredients',
-                          style: TextStyle(fontSize: 14),
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w900,
+                          ),
                         ),
                       ],
                     ),
                   ),
-                  SizedBox(width: 16),
+                  SizedBox(width: 15),
+
                   // 🔹 Second Lottie Animation (Steps Count)
                   Container(
-                    width: 130,
+                    width: 100,
                     padding: EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -82,19 +85,58 @@ class RecipeDetailPage extends StatelessWidget {
                       children: [
                         Lottie.asset(
                           'assets/animations/cooking.json',
-                          width: 80,
-                          height: 80,
+                          width: 50,
+                          height: 50,
                           fit: BoxFit.cover,
                         ),
-
-                        SizedBox(height: 8),
+                        SizedBox(height: 6),
                         Text(
                           '${recipe['steps'].length} Steps',
-                          style: TextStyle(fontSize: 14),
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w900,
+                          ),
                         ),
                       ],
                     ),
                   ),
+                  SizedBox(width: 15),
+
+                  // 🔹 Third Lottie Animation (Rough Time)
+                  if (recipe['roughTime'] != null)
+                    Container(
+                      width: 100, // ✅ Reduced width
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 8,
+                            offset: Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          Lottie.asset(
+                            'assets/animations/timer.json',
+                            width: 50,
+                            height: 50,
+                            fit: BoxFit.cover,
+                          ),
+                          SizedBox(height: 6),
+                          Text(
+                            recipe['roughTime'],
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                 ],
               ),
 

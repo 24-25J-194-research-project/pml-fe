@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 import '../services/api_service.dart';
 import '../services/notification_service.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class RecipePage extends StatefulWidget {
   @override
@@ -84,8 +85,11 @@ class _RecipePageState extends State<RecipePage> {
                 children: [
                   // ✅ Title
                   Text(
-                    "Add a New Recipe",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                    "Add new recipe",
+                    style: GoogleFonts.bebasNeue(
+                      fontSize: 30,
+                      color: Colors.black,
+                    ),
                   ),
                   SizedBox(height: 12),
 
@@ -118,21 +122,27 @@ class _RecipePageState extends State<RecipePage> {
                   SizedBox(height: 30),
 
                   // ✅ Generate Button
-                  ElevatedButton(
-                    onPressed: () => Navigator.pop(context, name),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      padding: EdgeInsets.symmetric(
-                        vertical: 12,
-                        horizontal: 24,
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(context, name),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        padding: EdgeInsets.symmetric(
+                          vertical: 12,
+                          horizontal: 24,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                      child: Text(
+                        "generate recipe",
+                        style: GoogleFonts.bebasNeue(
+                          fontSize: 24,
+                          color: Colors.white,
+                        ),
                       ),
-                    ),
-                    child: Text(
-                      "Generate Recipe",
-                      style: TextStyle(fontSize: 16, color: Colors.white),
                     ),
                   ),
                 ],
@@ -152,7 +162,10 @@ class _RecipePageState extends State<RecipePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Recipes", style: TextStyle(fontWeight: FontWeight.w600)),
+        title: Text(
+          "recipe collection",
+          style: GoogleFonts.bebasNeue(fontSize: 30, color: Colors.black),
+        ),
         centerTitle: true,
       ),
 

@@ -263,8 +263,11 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               child: Center(
                 child: Text(
-                  "Save Details",
-                  style: TextStyle(fontSize: 16, color: Colors.white),
+                  "save profile details",
+                  style: GoogleFonts.bebasNeue(
+                    fontSize: 24,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),

@@ -3,6 +3,8 @@ import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:google_fonts/google_fonts.dart';
+
 import '../services/api_service.dart';
 import 'package:go_router/go_router.dart';
 
@@ -167,10 +169,15 @@ class _PMLPageState extends State<PMLPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Personal Cooking Assistant"),
+        backgroundColor: Colors.blue.shade50,
+        elevation: 0,
+        title: Text(
+          "your personal  assistant",
+          style: GoogleFonts.bebasNeue(fontSize: 30, color: Colors.black),
+        ),
         actions: [
           IconButton(
-            icon: Icon(Icons.settings),
+            icon: Icon(Icons.settings_outlined),
             onPressed: () {
               context
                   .push('/settings')
@@ -179,83 +186,153 @@ class _PMLPageState extends State<PMLPage> {
           ),
         ],
       ),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Expanded(
-              child:
-                  _historyMode
-                      ? ListView.builder(
-                        controller: _scrollController,
-                        itemCount: _chatHistory.length,
-                        itemBuilder: (context, index) {
-                          final message = _chatHistory[index];
-                          bool isUser = message["role"] == "user";
-                          return Align(
-                            alignment:
-                                isUser
-                                    ? Alignment.centerRight
-                                    : Alignment.centerLeft,
-                            child: Container(
-                              padding: EdgeInsets.all(10),
-                              margin: EdgeInsets.symmetric(vertical: 4),
-                              decoration: BoxDecoration(
-                                color:
-                                    isUser
-                                        ? Colors.blueAccent
-                                        : Colors.grey[300],
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text(
-                                message["text"]!,
-                                style: TextStyle(
-                                  color: isUser ? Colors.white : Colors.black,
+      extendBodyBehindAppBar: true,
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("assets/images/sky.jpg"),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              Expanded(
+                child:
+                    _historyMode
+                        ? ListView.builder(
+                          controller: _scrollController,
+                          itemCount: _chatHistory.length,
+                          itemBuilder: (context, index) {
+                            final message = _chatHistory[index];
+                            bool isUser = message["role"] == "user";
+
+                            return Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment:
+                                  isUser
+                                      ? MainAxisAlignment.end
+                                      : MainAxisAlignment.start,
+                              children: [
+                                // ✅ Assistant Icon (Left side)
+                                if (!isUser)
+                                  Padding(
+                                    padding: EdgeInsets.only(right: 8, top: 8),
+                                    child: Icon(
+                                      Icons
+                                          .smart_toy_outlined, // ✅ Assistant icon
+                                      color: Colors.grey,
+                                      size: 24,
+                                    ),
+                                  ),
+
+                                // ✅ Chat Bubble
+                                Flexible(
+                                  child: Container(
+                                    padding: EdgeInsets.all(10),
+                                    margin: EdgeInsets.symmetric(vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color:
+                                          isUser
+                                              ? Colors.blueAccent
+                                              : Colors.grey[300],
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Text(
+                                      message["text"]!,
+                                      style: TextStyle(
+                                        color:
+                                            isUser
+                                                ? Colors.white
+                                                : Colors.black,
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                              ),
+
+                                // ✅ User Icon (Right side)
+                                if (isUser)
+                                  Padding(
+                                    padding: EdgeInsets.only(left: 8, top: 4),
+                                    child: Icon(
+                                      Icons.person, // ✅ User icon
+                                      color: Colors.blue,
+                                      size: 24,
+                                    ),
+                                  ),
+                              ],
+                            );
+                          },
+                        )
+                        : SingleChildScrollView(
+                          child: Padding(
+                            padding: EdgeInsets.only(bottom: 16.0),
+                            child: Text(
+                              _response,
+                              style: TextStyle(fontSize: 18),
                             ),
-                          );
-                        },
-                      )
-                      : SingleChildScrollView(
-                        child: Padding(
-                          padding: EdgeInsets.only(bottom: 16.0),
-                          child: Text(
-                            _response,
-                            style: TextStyle(fontSize: 18),
                           ),
                         ),
+              ),
+
+              // ✅ TextField for user input
+              TextField(
+                controller: _messageController,
+                decoration: InputDecoration(labelText: "Ask me something..."),
+              ),
+
+              SizedBox(height: 10),
+
+              // ✅ Send, Mic, and Speaker Buttons
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: _sendMessage,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        padding: EdgeInsets.symmetric(vertical: 14),
+                        elevation: 4, // ✅ Floating effect
+                        shadowColor: Colors.blueGrey, // ✅ Black shadow
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                            12,
+                          ), // ✅ Rounded corners
+                        ),
                       ),
-            ),
-            TextField(
-              controller: _messageController,
-              decoration: InputDecoration(labelText: "Ask me something..."),
-            ),
-            SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: _sendMessage,
-                    child: Text("Send"),
+                      child: Text(
+                        "SEND TO ASSISTANT",
+                        style: GoogleFonts.bebasNeue(
+                          fontSize: 20,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-                SizedBox(width: 10),
-                IconButton(
-                  icon: Icon(
-                    _isListening ? Icons.mic_off : Icons.mic,
-                    color: Colors.red,
+                  // Expanded(
+                  //   child: ElevatedButton(
+                  //     onPressed: _sendMessage,
+                  //     child: Text("Send"),
+                  //   ),
+                  // ),
+                  SizedBox(width: 10),
+                  IconButton(
+                    icon: Icon(
+                      _isListening ? Icons.mic_off : Icons.mic,
+                      color: Colors.red,
+                    ),
+                    onPressed: _startListening,
                   ),
-                  onPressed: _startListening,
-                ),
-                SizedBox(width: 10),
-                IconButton(
-                  icon: Icon(Icons.volume_up, color: Colors.blue),
-                  onPressed: _speakResponse,
-                ),
-              ],
-            ),
-          ],
+                  SizedBox(width: 10),
+                  IconButton(
+                    icon: Icon(Icons.volume_up, color: Colors.blue),
+                    onPressed: _speakResponse,
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
