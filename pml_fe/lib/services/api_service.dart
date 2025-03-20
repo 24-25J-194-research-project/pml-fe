@@ -90,4 +90,53 @@ class ApiService {
       throw Exception("Failed to delete recipe");
     }
   }
+
+  // companion services
+  // ✅ Create Virtual Companion
+  static Future<Map<String, dynamic>> createCompanion(String username) async {
+    final response = await http.post(
+      Uri.parse("$baseUrl/create-companion"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({"username": username}),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception("Failed to create companion.");
+    }
+  }
+
+  // ✅ Send Message to Virtual Companion
+  static Future<String> interactWithCompanion(
+    String username,
+    String message,
+  ) async {
+    final response = await http.post(
+      Uri.parse("$baseUrl/interact-companion"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({"username": username, "userMessage": message}),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body)["reply"];
+    } else {
+      throw Exception("Failed to interact with companion.");
+    }
+  }
+
+  // ✅ Get Conversation History (Companion)
+  static Future<Map<String, dynamic>> getCompanionHistory(
+    String username,
+  ) async {
+    final response = await http.get(
+      Uri.parse("$baseUrl/companion-history?username=$username"),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception("Failed to load companion conversation history");
+    }
+  }
 }

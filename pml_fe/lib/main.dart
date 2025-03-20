@@ -8,6 +8,7 @@ import 'pages/recipie_page.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'pages/recipie_detail_page.dart';
 import 'pages/interactive_cooking_page.dart';
+import 'pages/companion_page.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<void> main() async {
@@ -44,6 +45,7 @@ class DementiaCookingApp extends StatelessWidget {
     routes: [
       GoRoute(path: '/', builder: (context, state) => LandingPage()),
       GoRoute(path: '/pml', builder: (context, state) => PMLPage()),
+      GoRoute(path: '/companion', builder: (context, state) => CompanionPage()),
       GoRoute(path: '/settings', builder: (context, state) => SettingsPage()),
       GoRoute(path: '/profile', builder: (context, state) => ProfilePage()),
       GoRoute(path: '/recipes', builder: (context, state) => RecipePage()),
