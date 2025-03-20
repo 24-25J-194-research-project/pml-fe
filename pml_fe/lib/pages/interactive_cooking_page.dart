@@ -67,7 +67,7 @@ class _InteractiveCookingPageState extends State<InteractiveCookingPage> {
   void _loadProfileData() async {
     final response = await http.get(
       Uri.parse(
-        'http://10.0.2.2:3000/cooking-assistant/user/health-conditions?username=user1',
+        'http://192.168.1.5:3000/cooking-assistant/user/health-conditions?username=user1',
       ),
     );
 
@@ -243,7 +243,7 @@ class _InteractiveCookingPageState extends State<InteractiveCookingPage> {
     try {
       final response = await http.get(
         Uri.parse(
-          'http://10.0.2.2:3000/cooking-assistant/user/health-conditions?username=user1',
+          'http://192.168.1.5:3000/cooking-assistant/user/health-conditions?username=user1',
         ),
       );
 

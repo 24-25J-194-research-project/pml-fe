@@ -30,7 +30,7 @@ class _ProfilePageState extends State<ProfilePage> {
   void _loadProfileData() async {
     final response = await http.get(
       Uri.parse(
-        'http://10.0.2.2:3000/cooking-assistant/user/health-conditions?username=user1',
+        'http://192.168.1.5:3000/cooking-assistant/user/health-conditions?username=user1',
       ),
     );
 
@@ -53,7 +53,7 @@ class _ProfilePageState extends State<ProfilePage> {
   void _saveProfileData() async {
     final response = await http.post(
       Uri.parse(
-        'http://10.0.2.2:3000/cooking-assistant/user/update-health-conditions',
+        'http://192.168.1.5:3000/cooking-assistant/user/update-health-conditions',
       ),
       headers: {"Content-Type": "application/json"},
       body: jsonEncode({

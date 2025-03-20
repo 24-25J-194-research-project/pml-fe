@@ -5,13 +5,35 @@ import 'pages/pml_page.dart';
 import 'pages/settings_page.dart';
 import 'pages/profile_page.dart';
 import 'pages/recipie_page.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'pages/recipie_detail_page.dart';
 import 'pages/interactive_cooking_page.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<void> main() async {
-  await dotenv.load(fileName: ".env");
+  // ✅ Initialize Flutter bindings at the very beginning
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // ✅ Request permissions after initialization
+  WidgetsBinding.instance.addPostFrameCallback((_) async {
+    await requestMicrophonePermission();
+  });
+
   runApp(DementiaCookingApp());
+}
+
+Future<void> requestMicrophonePermission() async {
+  var status = await Permission.microphone.request();
+  if (status.isGranted) {
+    print("Microphone permission granted");
+  } else if (status.isDenied) {
+    print("Microphone permission denied");
+  } else if (status.isPermanentlyDenied) {
+    print(
+      "Microphone permission permanently denied. Please enable it from settings.",
+    );
+    openAppSettings(); // ✅ Opens app settings if permission is permanently denied
+  }
 }
 
 class DementiaCookingApp extends StatelessWidget {

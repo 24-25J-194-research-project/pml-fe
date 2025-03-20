@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 
 class ApiService {
   static const String baseUrl =
-      "http://10.0.2.2:3000/cooking-assistant"; // Change to backend URL
+      "http://192.168.1.5:3000/cooking-assistant"; // Change to backend URL
 
   // Create Assistant for User
   static Future<Map<String, dynamic>> createAssistant(String username) async {
